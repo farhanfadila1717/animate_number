@@ -1,7 +1,8 @@
 name: animate_number
 description: "Animate number is Flutter package to create easy slide animation number"
-version: 0.2.0
+version: 0.2.1
 homepage: https://farhan-fadila.web.app/
+repository: https://github.com/farhanfadila1717/animate_number
 
 environment:
   sdk: ">=3.2.3 <4.0.0"

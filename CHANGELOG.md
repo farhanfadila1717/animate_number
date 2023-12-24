@@ -1,3 +1,8 @@
+## 0.2.1
+
+- update README.md
+- pubspec add repository
+
 ## 0.2.0
 
 - fix duration
