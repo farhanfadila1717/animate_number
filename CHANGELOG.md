@@ -1,3 +1,7 @@
+## 0.2.2
+
+- update README.md add gif
+
 ## 0.2.1
 
 - update README.md
