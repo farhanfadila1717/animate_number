@@ -22,6 +22,8 @@ Farhan The author of this package is available for hiring as Flutter Developer. 
   )
 ```
 
+<img src="https://raw.githubusercontent.com/farhanfadila1717/flutter_package/master/display/animate_number/output.gif" alt="Girl in a jacket" width="300">
+
 see full example [here](https://github.com/farhanfadila1717/animate_number/blob/main/example/main.dart)
 
 ## 🚧 Maintainer
