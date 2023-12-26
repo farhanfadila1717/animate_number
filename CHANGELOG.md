@@ -1,3 +1,8 @@
+## 2.0.0
+
+- feat number format
+- refactor int to num
+
 ## 1.0.0
 
 - fix animation slide down or up logic
