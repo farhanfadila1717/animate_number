@@ -2,8 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:after_layout/after_layout.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+
+/// DigitSlideState
+enum DigitSlideState {
+  none,
+  iddle,
+}
 
 /// {@template digit_animation}
 /// The DigitAnimation is widget for animation each digit
@@ -11,10 +17,14 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 class DigitAnimation extends StatefulWidget {
   const DigitAnimation({
     super.key,
+    required this.number,
     required this.value,
     this.style,
     this.digitDuration,
   });
+
+  /// The real number
+  final int number;
 
   /// The current digit value
   final int value;
@@ -49,12 +59,16 @@ class DigitAnimation extends StatefulWidget {
 class _DigitAnimationState extends State<DigitAnimation>
     with SingleTickerProviderStateMixin, AfterLayoutMixin {
   int _currentIndex = 0;
+  late int _number;
   late final AutoScrollController _autoScrollController;
+  late final ValueNotifier<DigitSlideState> _digitSlideState;
 
   @override
   void initState() {
     super.initState();
     _autoScrollController = AutoScrollController();
+    _digitSlideState = ValueNotifier(DigitSlideState.none);
+    _number = widget.number;
   }
 
   @override
@@ -71,26 +85,43 @@ class _DigitAnimationState extends State<DigitAnimation>
 
   int get displayedNumber => _currentIndex % 10;
 
-  void navigateToIndex(int index) {
+  Future<void> navigateToIndex(int index) async {
     if (_autoScrollController.isAutoScrolling) return;
 
     var diffrence = _currentIndex - index;
+    var isUp = widget.number > _number;
 
     if (diffrence.isNegative) {
       diffrence *= -1;
     }
 
     final duration = widget.digitDuration ?? const Duration(milliseconds: 200);
+    final destinationIndex = isUp ? index + 10 : index;
 
-    _autoScrollController.scrollToIndex(
-      index,
+    _currentIndex = index;
+    _number = widget.number;
+
+    await _autoScrollController.scrollToIndex(
+      destinationIndex,
       preferPosition: AutoScrollPosition.begin,
       duration: Duration(
         milliseconds:
             max(duration.inMilliseconds, duration.inMilliseconds * diffrence),
       ),
     );
-    _currentIndex = index;
+    navigateToIddle(index);
+  }
+
+  /// Reset digit to center
+  Future<void> navigateToIddle(int index) async {
+    _digitSlideState.value = DigitSlideState.iddle;
+    await _autoScrollController.scrollToIndex(
+      index + 10,
+      duration: const Duration(microseconds: 1),
+      preferPosition: AutoScrollPosition.begin,
+    );
+    if (!mounted) return;
+    _digitSlideState.value = DigitSlideState.none;
   }
 
   Size get size {
@@ -112,34 +143,51 @@ class _DigitAnimationState extends State<DigitAnimation>
   @override
   void dispose() {
     _autoScrollController.dispose();
+    _digitSlideState.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      child: Stack(
-        children: [
-          SizedBox(
-            width: size.width,
-            height: size.height,
-            child: ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              controller: _autoScrollController,
-              itemCount: 10,
-              itemBuilder: (context, index) => AutoScrollTag(
-                index: index,
-                controller: _autoScrollController,
-                key: ValueKey(index),
-                child: Text(
-                  '$index',
-                  style: widget.style,
+      child: SizedBox(
+        width: size.width,
+        height: size.height,
+        child: ValueListenableBuilder(
+          valueListenable: _digitSlideState,
+          builder: (_, slideState, __) {
+            return Stack(
+              children: [
+                Opacity(
+                  opacity: slideState == DigitSlideState.iddle ? 0.0 : 1.0,
+                  child: ColoredBox(
+                    color: Colors.amber,
+                    child: ListView.builder(
+                      controller: _autoScrollController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: 30,
+                      itemBuilder: (context, index) => AutoScrollTag(
+                        index: index,
+                        controller: _autoScrollController,
+                        key: ValueKey(index),
+                        child: Text(
+                          '${index % 10}',
+                          style: widget.style,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ],
+                if (slideState == DigitSlideState.iddle)
+                  Text(
+                    '$displayedNumber',
+                    style: widget.style,
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

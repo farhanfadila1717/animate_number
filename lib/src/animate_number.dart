@@ -52,6 +52,7 @@ class AnimateNumber extends StatelessWidget {
           children: List.generate(
             digitCount,
             (index) => DigitAnimation(
+              number: value,
               value: int.parse(valueInString[index]),
               style: style,
               digitDuration: digitDuration,
