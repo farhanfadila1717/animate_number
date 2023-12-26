@@ -1,3 +1,7 @@
+## 1.0.0
+
+- fix animation slide down or up logic
+
 ## 0.2.2
 
 - update README.md add gif
