@@ -24,7 +24,7 @@ class DigitAnimation extends StatefulWidget {
   });
 
   /// The real number
-  final int number;
+  final num number;
 
   /// The current digit value
   final int value;
@@ -59,7 +59,7 @@ class DigitAnimation extends StatefulWidget {
 class _DigitAnimationState extends State<DigitAnimation>
     with SingleTickerProviderStateMixin, AfterLayoutMixin {
   int _currentIndex = 0;
-  late int _number;
+  late num _number;
   late final AutoScrollController _autoScrollController;
   late final ValueNotifier<DigitSlideState> _digitSlideState;
 
@@ -89,7 +89,7 @@ class _DigitAnimationState extends State<DigitAnimation>
     if (_autoScrollController.isAutoScrolling) return;
 
     var diffrence = _currentIndex - index;
-    var isUp = widget.number > _number;
+    var isUp = widget.number >= _number;
 
     if (diffrence.isNegative) {
       diffrence *= -1;
@@ -114,6 +114,7 @@ class _DigitAnimationState extends State<DigitAnimation>
 
   /// Reset digit to center
   Future<void> navigateToIddle(int index) async {
+    if (!mounted) return;
     _digitSlideState.value = DigitSlideState.iddle;
     await _autoScrollController.scrollToIndex(
       index + 10,
@@ -160,21 +161,18 @@ class _DigitAnimationState extends State<DigitAnimation>
               children: [
                 Opacity(
                   opacity: slideState == DigitSlideState.iddle ? 0.0 : 1.0,
-                  child: ColoredBox(
-                    color: Colors.amber,
-                    child: ListView.builder(
+                  child: ListView.builder(
+                    controller: _autoScrollController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: 30,
+                    itemBuilder: (context, index) => AutoScrollTag(
+                      index: index,
                       controller: _autoScrollController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      itemCount: 30,
-                      itemBuilder: (context, index) => AutoScrollTag(
-                        index: index,
-                        controller: _autoScrollController,
-                        key: ValueKey(index),
-                        child: Text(
-                          '${index % 10}',
-                          style: widget.style,
-                        ),
+                      key: ValueKey(index),
+                      child: Text(
+                        '${index % 10}',
+                        style: widget.style,
                       ),
                     ),
                   ),

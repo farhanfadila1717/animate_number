@@ -3,16 +3,17 @@ import 'dart:math';
 
 import 'package:animate_number/animate_number.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class Example extends StatefulWidget {
-  const Example({super.key});
+class AnimateNumberPage extends StatefulWidget {
+  const AnimateNumberPage({super.key});
 
   @override
-  State<Example> createState() => _ExampleState();
+  State<AnimateNumberPage> createState() => _AnimateNumberPageState();
 }
 
-class _ExampleState extends State<Example> {
-  late final ValueNotifier<int> _numberNotifier;
+class _AnimateNumberPageState extends State<AnimateNumberPage> {
+  late final ValueNotifier<num> _numberNotifier;
   late final Timer _timer;
 
   @override
@@ -27,7 +28,7 @@ class _ExampleState extends State<Example> {
     _timer = Timer.periodic(
       const Duration(seconds: 3),
       (timer) {
-        _numberNotifier.value = 100 + random.nextInt(899);
+        _numberNotifier.value = (1000 + random.nextInt(8999)).toDouble();
       },
     );
   }
@@ -47,12 +48,25 @@ class _ExampleState extends State<Example> {
       ),
       body: SizedBox.expand(
         child: Center(
-          child: AnimateNumber(
-            number: _numberNotifier,
-            style: const TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimateNumber(
+                number: _numberNotifier,
+                numberFormat: NumberFormat("###,###.###"),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Text(
+                'watching',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              )
+            ],
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'digit_animation.dart';
 
@@ -29,10 +30,11 @@ class AnimateNumber extends StatelessWidget {
     required this.number,
     this.style,
     this.digitDuration,
+    this.numberFormat,
   });
 
-  /// The [ValueNotifier<int>] that holds the current number value.
-  final ValueNotifier<int> number;
+  /// The [ValueNotifier<num>] that holds the current number value.
+  final ValueNotifier<num> number;
 
   /// The [TextStyle] to apply to the digits.
   final TextStyle? style;
@@ -40,26 +42,50 @@ class AnimateNumber extends StatelessWidget {
   /// {@macro digit_duration}
   final Duration? digitDuration;
 
+  ///
+  final NumberFormat? numberFormat;
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: number,
       builder: (_, value, __) {
-        final valueInString = value.toString();
-        final digitCount = value.toString().length;
+        var valueInString = value.toString();
+
+        if (numberFormat != null) {
+          valueInString = numberFormat!.format(value);
+        }
+
+        var itemCount = valueInString.length;
 
         return Wrap(
           children: List.generate(
-            digitCount,
-            (index) => DigitAnimation(
-              number: value,
-              value: int.parse(valueInString[index]),
-              style: style,
-              digitDuration: digitDuration,
-            ),
+            itemCount,
+            (index) {
+              final item = valueInString[index];
+
+              if (!item.isNumber) {
+                return Text(item, style: style);
+              }
+
+              return DigitAnimation(
+                number: value,
+                value: int.parse(valueInString[index]),
+                style: style,
+                digitDuration: digitDuration,
+              );
+            },
           ),
         );
       },
     );
+  }
+}
+
+extension on String {
+  bool get isNumber {
+    final parsedNumber = int.tryParse(this);
+
+    return parsedNumber != null;
   }
 }
