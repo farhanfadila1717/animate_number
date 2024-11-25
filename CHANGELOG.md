@@ -1,3 +1,7 @@
+## 2.0.1
+
+- docs: update readme
+
 ## 2.0.0
 
 - feat number format

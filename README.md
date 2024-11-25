@@ -8,10 +8,6 @@ Animate number is Flutter package to create easy slide animation number.
 [![qr-paypal][]][paypal account]
 <br><br>
 
-## 🌟 Open To Work / Freelance
-
-Farhan The author of this package is available for hiring as Flutter Developer. See portofolio website [here](https://farhanfadila.site/).
-
 ## 🛠️ Example
 
 ```dart
